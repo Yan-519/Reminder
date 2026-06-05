@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local ="clr-namespace:Reminder"
+             Shell.NavBarIsVisible="False"
+             x:Class="Reminder.MainPage">
+
+    <VerticalStackLayout Spacing="10" BackgroundColor="#D1E7CC" Padding="10">
+
+        <Grid ColumnDefinitions="auto, *, auto">
+            <Button Text="Create"
+                    TextColor="Black" BackgroundColor="White"
+                    FontSize="20"
+                    Grid.Column="0"
+                    Clicked="create_new_reminder"/>
+
+            <Button Text="Refresh"
+                    TextColor="Black" BackgroundColor="White"
+                    FontSize="20"
+                    Grid.Column="2"
+                    Clicked="refresh_list"/>
+        </Grid>
+        
+
+        <ScrollView VerticalScrollBarVisibility="Always">
+            <CollectionView x:Name="reminders_view">
+                <CollectionView.ItemTemplate>
+
+                    <DataTemplate x:DataType="local:Remind">
+
+                        <Border BackgroundColor="White">
+
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="27.5"/>
+                            </Border.StrokeShape>
+
+
+                            <Grid ColumnDefinitions="auto, *, auto" ColumnSpacing="10" >
+
+                                <Label  Text="{Binding view_date}"
+                                        LineBreakMode="WordWrap"
+                                        TextColor="Black" BackgroundColor="Transparent"
+                                        HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+                                        Padding="10"
+                                        FontSize="20"
+                                        Grid.Column="0"/>
+                            
+                                <Button Text="Edit"
+                                        TextColor="Black" BackgroundColor="Transparent"
+                                        Padding="10"
+                                        FontSize="20"
+                                        BindingContext="{Binding id}"
+                                        Clicked="edit_reminder"
+                                        Grid.Column="2"/>
+
+                            </Grid>
+                            
+                        </Border>
+
+                    </DataTemplate>
+                    
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </ScrollView>
+        
+        
+
+
+    </VerticalStackLayout>
+
+</ContentPage>
