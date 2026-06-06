@@ -51,7 +51,6 @@ namespace Reminder
             }
             while (ids.Contains(id));
 
-
             await Navigation.PushAsync(new Change_reminder(null, id));
         }
 

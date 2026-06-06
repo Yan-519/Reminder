@@ -9,6 +9,7 @@
 
             <Editor x:Name="MessageEntry"
                     TextColor="Black"
+                    PlaceholderColor="Black"
                     Placeholder="Enter message"
                     AutoSize="TextChanges"
                     VerticalOptions="Start" />
@@ -21,8 +22,8 @@
             <Label Text="Next Date\Time(HH-MM:SS)" TextColor="Black" />
             <HorizontalStackLayout>
                 <DatePicker x:Name="NextDatePicker" TextColor="Black" />
-                <TimePicker x:Name="NextTimePicker" TextColor="Black"/>
-                <Picker x:Name="NextTimeSecondPicker" WidthRequest="80" TextColor="Black"/>
+                <TimePicker x:Name="NextTimePicker" TextColor="Black" />
+                <Picker x:Name="NextTimeSecondPicker" WidthRequest="80" TextColor="Black" TitleColor="Black"/>
             </HorizontalStackLayout>
 
             <HorizontalStackLayout VerticalOptions="Center" Spacing="8">
@@ -32,29 +33,25 @@
 
             <VerticalStackLayout IsEnabled="{Binding Source={x:Reference IntervalCheck}, Path=IsChecked}">
 
-                <Label Text="Interval Duration HH-MM:SS\Days-Months-Years" TextColor="Black" />
-                <Grid ColumnDefinitions="auto, auto, *,*,*" RowDefinitions="Auto" ColumnSpacing="8">
-                    <TimePicker x:Name="IntervalTimePicker" Grid.Column="0" />
-                    <Picker x:Name="IntervalTimeSecondPicker" WidthRequest="80" Grid.Column="1"/>
+                <Label Text="Interval Duration Days-Years\HH:MM-SS" TextColor="Black" />
+                <Grid ColumnDefinitions="*, *, auto, auto" RowDefinitions="Auto" ColumnSpacing="8">
 
-                    <VerticalStackLayout Grid.Column="2" Spacing="4">
+                    <VerticalStackLayout Grid.Column="0" Spacing="4">
                         <Label Text="Days" FontSize="Micro" TextColor="Black" />
-                        <Entry x:Name="IntervalDaysEntry" Keyboard="Numeric" Placeholder="0" TextColor="Black"/>
+                        <Entry x:Name="IntervalDaysEntry" Keyboard="Numeric" Placeholder="0" TextColor="Black" PlaceholderColor="Black"/>
                     </VerticalStackLayout>
-
-                    <VerticalStackLayout Grid.Column="3" Spacing="4">
-                        <Label Text="Months" FontSize="Micro"  TextColor="Black"/>
-                        <Entry x:Name="IntervalMonthsEntry" Keyboard="Numeric" Placeholder="0" TextColor="Black"/>
-                    </VerticalStackLayout>
-
-                    <VerticalStackLayout Grid.Column="4" Spacing="4">
+                    
+                    <VerticalStackLayout Grid.Column="1" Spacing="4">
                         <Label Text="Years" FontSize="Micro"  TextColor="Black"/>
-                        <Entry x:Name="IntervalYearsEntry" Keyboard="Numeric" Placeholder="0" TextColor="Black"/>
+                        <Entry x:Name="IntervalYearsEntry" Keyboard="Numeric" Placeholder="0" TextColor="Black" PlaceholderColor="Black"/>
                     </VerticalStackLayout>
+
+                    <TimePicker x:Name="IntervalTimePicker" Grid.Column="2" TextColor="Black" />
+                    <Picker x:Name="IntervalTimeSecondPicker" WidthRequest="80" Grid.Column="3" TextColor="Black" TitleColor="Black"/>
                 </Grid>
 
                 <HorizontalStackLayout VerticalOptions="Center" Spacing="8">
-                    <CheckBox x:Name="StopCheck"  />
+                    <CheckBox x:Name="StopCheck" Color="Black" />
                     <Label Text="Enable Stop" VerticalOptions="Center" TextColor="Black" />
                 </HorizontalStackLayout>
 
@@ -68,17 +65,17 @@
                     <HorizontalStackLayout>
 
                         <VerticalStackLayout x:Name="StopDate">
-                            <Label Text="Stop Date\Time(HH-MM:SS)" TextColor="Black" />
+                            <Label Text="Stop Date\Time(HH:MM-SS)" TextColor="Black" />
                             <HorizontalStackLayout>
-                                <DatePicker x:Name="StopDatePicker" TextColor="Black"/>
+                                <DatePicker x:Name="StopDatePicker" TextColor="Black" />
                                 <TimePicker x:Name="StopTimePicker" TextColor="Black" />
-                                <Picker x:Name="StopTimeSecondPicker" WidthRequest="80" TextColor="Black"/>
+                                <Picker x:Name="StopTimeSecondPicker" WidthRequest="80" TextColor="Black" TitleColor="Black"/>
                             </HorizontalStackLayout>
                         </VerticalStackLayout>
 
                         <VerticalStackLayout x:Name="StopCount">
                             <Label Text="Stop count" TextColor="Black" />
-                            <Entry x:Name="StopCountEntry" Keyboard="Numeric" TextColor="Black"/>
+                            <Entry x:Name="StopCountEntry" Keyboard="Numeric" TextColor="Black" PlaceholderColor="Black"/>
                         </VerticalStackLayout>
 
                     </HorizontalStackLayout>
@@ -86,7 +83,7 @@
                 </VerticalStackLayout>
             </VerticalStackLayout>
             
-            <Button Text="Create Remind" Clicked="OnCreateClicked" x:Name="CreateRemindButton" TextColor="Black" />
+            <Button Text="Create Remind" Clicked="OnCreateClicked" x:Name="CreateRemindButton" />
             <Button Text="Delete Remind" Clicked="OnDeleteClicked" BackgroundColor="Red" x:Name="DeleteRemindButton" IsVisible="False" TextColor="Black" />
 
         </VerticalStackLayout>

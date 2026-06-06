@@ -98,9 +98,7 @@ public partial class Change_reminder : ContentPage
             IntervalCheck.IsChecked = true;
             int totDays = (int)current.interval.TotalDays;
             IntervalYearsEntry.Text = (totDays / 365).ToString();
-            totDays %= 365;
-            IntervalMonthsEntry.Text = (totDays / 30).ToString();
-            IntervalDaysEntry.Text = (totDays % 30).ToString();
+            IntervalDaysEntry.Text = (totDays % 365).ToString();
             SetTimePickers(IntervalTimePicker, IntervalTimeSecondPicker, current.interval);
 
             if (current.type == Remind_type.Repeat_with_stop_date)
@@ -152,13 +150,10 @@ public partial class Change_reminder : ContentPage
                 if (int.TryParse(IntervalDaysEntry?.Text, out int days) && days < 0)
                     days = 0;
 
-                if (int.TryParse(IntervalMonthsEntry?.Text, out int months) && months < 0)
-                    months = 0;
-
                 if (int.TryParse(IntervalYearsEntry?.Text, out int years) && years < 0)
                     years = 0;
 
-                interval = TimeSpan.FromDays(days + months * 30L + years * 365L) +
+                interval = TimeSpan.FromDays(days + years * 365L) +
                     GetTimeFromPickers(IntervalTimePicker, IntervalTimeSecondPicker)!.Value;
 
                 if (interval <= TimeSpan.Zero)
