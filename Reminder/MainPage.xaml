@@ -20,21 +20,15 @@
                     Grid.Column="2"
                     Clicked="refresh_list"/>
         </Grid>
-        
 
         <ScrollView VerticalScrollBarVisibility="Always">
             <CollectionView x:Name="reminders_view">
                 <CollectionView.ItemTemplate>
-
                     <DataTemplate x:DataType="local:Remind">
-
                         <Border BackgroundColor="White">
-
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="27.5"/>
                             </Border.StrokeShape>
-
-
                             <Grid ColumnDefinitions="auto, *, auto" ColumnSpacing="10" >
 
                                 <Label  Text="{Binding view_date}"
@@ -44,7 +38,7 @@
                                         Padding="10"
                                         FontSize="20"
                                         Grid.Column="0"/>
-                            
+
                                 <Button Text="Edit"
                                         TextColor="Black" BackgroundColor="Transparent"
                                         Padding="10"
@@ -54,18 +48,11 @@
                                         Grid.Column="2"/>
 
                             </Grid>
-                            
                         </Border>
-
                     </DataTemplate>
-                    
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </ScrollView>
-        
-        
-
-
     </VerticalStackLayout>
 
 </ContentPage>

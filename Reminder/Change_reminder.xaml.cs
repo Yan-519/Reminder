@@ -24,7 +24,7 @@ public partial class Change_reminder : ContentPage
         SetActions();
 
         PopulateTimePickers();
-        Initialize_UI();
+        InitializeUI();
     }
 
     private void SetActions()
@@ -79,7 +79,7 @@ public partial class Change_reminder : ContentPage
         StopTimeSecondPicker.SelectedIndex = 0;
     }
 
-    private void Initialize_UI()
+    private void InitializeUI()
     {
         if (!is_new)
         {
@@ -135,7 +135,6 @@ public partial class Change_reminder : ContentPage
         try
         {
             string? message = MessageEntry?.Text?.Trim();
-
             if (string.IsNullOrEmpty(message))
             {
                 Message_box.Show("Message cannot be empty.");
@@ -148,17 +147,22 @@ public partial class Change_reminder : ContentPage
             if (IntervalCheck?.IsChecked == true)
             {
                 if (int.TryParse(IntervalDaysEntry?.Text, out int days) && days < 0)
-                    days = 0;
-
+                {
+                    Message_box.Show("Days in interval must be positive");
+                    return;
+                }
                 if (int.TryParse(IntervalYearsEntry?.Text, out int years) && years < 0)
-                    years = 0;
+                {
+                    Message_box.Show("Years in interval must be positive");
+                    return;
+                }
 
                 interval = TimeSpan.FromDays(days + years * 365L) +
                     GetTimeFromPickers(IntervalTimePicker, IntervalTimeSecondPicker)!.Value;
 
                 if (interval <= TimeSpan.Zero)
                 {
-                    Message_box.Error(nameof(OnCreateClicked), "Interval must be greater than zero.");
+                    Message_box.Show("Interval must be greater than zero.");
                     return;
                 }
             }
@@ -180,7 +184,10 @@ public partial class Change_reminder : ContentPage
                     }
                 }
                 else if(int.TryParse(StopCountEntry?.Text, out count) && count < 0)
-                    count = -1;
+                {
+                    Message_box.Show("Stop count must be positive");
+                    return;
+                }
             }
 
 

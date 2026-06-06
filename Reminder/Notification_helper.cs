@@ -1,6 +1,5 @@
 ﻿using Plugin.LocalNotification;
 using Plugin.LocalNotification.Core.Models;
-using Remind_type = Reminder.Remind.Remind_type;
 
 namespace Reminder
 {
@@ -33,13 +32,9 @@ namespace Reminder
 
             foreach (NotificationRequest notification in pending)
             {
-                if (Remind.TryParse(notification, out Remind remind))
+                if (Remind.TryParse(notification, out Remind remind) && remind.IsOld())
                 {
-                    if (remind.type == Remind_type.Once && remind.next < DateTimeOffset.Now ||
-                        remind.type == Remind_type.Repeat_with_stop_date && remind.stop < DateTimeOffset.Now)
-                    {
-                        LocalNotificationCenter.Current.Cancel(notification.NotificationId);
-                    }
+                    LocalNotificationCenter.Current.Cancel(notification.NotificationId);
                 }
             }
         }

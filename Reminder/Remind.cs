@@ -93,7 +93,7 @@ namespace Reminder
                 return;
 
             else if (type == Remind_type.Repeat_with_stop_count)
-                for (int i = 0; next < DateTimeOffset.Now && i < StopAfter; i++)
+                for (; next < DateTimeOffset.Now && 0 < StopAfter; StopAfter--)
                     next = next.Add(interval);
 
             else while (next < DateTimeOffset.Now)
@@ -197,14 +197,23 @@ namespace Reminder
             Remind remind;
             if (stop != default)
                 remind = new Remind(Id, Message, next, interval, stop);
-            else if(Count != -1)
+            else if (Count != -1)
                 remind = new Remind(Id, Message, next, interval, Count);
-            else if(interval != default)
+            else if (interval != default)
                 remind = new Remind(Id, Message, next, interval);
             else
                 remind = new Remind(Id, Message, next);
 
             return remind;
         }
+
+        public bool IsOld() => type switch
+        {
+            Remind_type.Once => next < DateTimeOffset.Now,
+            Remind_type.Repeat_with_stop_date => stop < DateTimeOffset.Now,
+            Remind_type.Repeat_with_stop_count => StopAfter <= 0,
+            _ => false
+        };
+
     }
 }

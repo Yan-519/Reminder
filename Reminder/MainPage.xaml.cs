@@ -54,10 +54,6 @@ namespace Reminder
             await Navigation.PushAsync(new Change_reminder(null, id));
         }
 
-        private void refresh_list(object sender, EventArgs e)
-        {
-            Notification_helper.ManageScheduledNotifications();
-            OnAppearing();
-        }
+        private void refresh_list(object sender, EventArgs e) => OnAppearing();
     }
 }
