@@ -21,12 +21,18 @@ public partial class Change_reminder : ContentPage
         current = reminder;
         current_id = new_id;
 
-        NextDatePicker.Date = DateTime.Today;
-        StopDatePicker.Date = DateTime.Today;
+        SetActions();
 
+        PopulateTimePickers();
+        Initialize_UI();
+    }
+
+    private void SetActions()
+    {
         IntervalCheck.IsChecked = false;
         StopCheck.IsChecked = false;
         SecChangeBox.IsChecked = true;
+        StopCount.IsEnabled = false;
 
         SecChangeBox.CheckedChanged += (_, args) =>
         {
@@ -50,9 +56,12 @@ public partial class Change_reminder : ContentPage
             else StopCheck.IsEnabled = true;
         };
 
+        StopSwitch.Toggled += (_, args) =>
+        {
+            StopCount.IsEnabled = args.Value;
+            StopDate.IsEnabled = !args.Value;
+        };
 
-        PopulateTimePickers();
-        Initialize_UI();
     }
 
     private void PopulateTimePickers()
@@ -84,17 +93,31 @@ public partial class Change_reminder : ContentPage
         NextDatePicker.Date = current.next.Date;
         SetTimePickers(NextTimePicker, NextTimeSecondPicker, current.next.TimeOfDay);
 
-        if (current.type == Remind_type.Repeat_without_stop || current.type == Remind_type.Repeat_with_stop)
+        if ((current.type & Remind.WithInterval) != 0)
         {
             IntervalCheck.IsChecked = true;
+            int totDays = (int)current.interval.TotalDays;
+            IntervalYearsEntry.Text = (totDays / 365).ToString();
+            totDays %= 365;
+            IntervalMonthsEntry.Text = (totDays / 30).ToString();
+            IntervalDaysEntry.Text = (totDays % 30).ToString();
             SetTimePickers(IntervalTimePicker, IntervalTimeSecondPicker, current.interval);
 
-            if (current.type == Remind_type.Repeat_with_stop)
+            if (current.type == Remind_type.Repeat_with_stop_date)
             {
                 StopCheck.IsChecked = true;
 
                 StopDatePicker.Date = current.stop.Date;
                 SetTimePickers(StopTimePicker, StopTimeSecondPicker, current.stop.TimeOfDay);
+            }
+            else if (current.type == Remind_type.Repeat_with_stop_count)
+            {
+                StopCheck.IsChecked = true;
+                StopSwitch.IsToggled = true;
+                StopCount.IsEnabled = true;
+                StopDate.IsEnabled = false;
+
+                StopCountEntry.Text = current.StopAfter.ToString();
             }
         }
     }
@@ -146,19 +169,27 @@ public partial class Change_reminder : ContentPage
             }
 
             DateTimeOffset stop = default;
+            int count = -1;
             if (StopCheck?.IsChecked == true)
             {
                 if (IntervalCheck?.IsChecked != true)
                     return;
-                stop = GetDateTimeOffset(StopDatePicker, StopTimePicker, StopTimeSecondPicker);
-                if (stop <= next)
+
+                if (!StopSwitch.IsToggled)
                 {
-                    Message_box.Show("Stop date must be greater than next date.");
-                    return;
+                    stop = GetDateTimeOffset(StopDatePicker, StopTimePicker, StopTimeSecondPicker);
+                    if (stop <= next)
+                    {
+                        Message_box.Show("Stop date must be greater than next date.");
+                        return;
+                    }
                 }
+                else if(int.TryParse(StopCountEntry?.Text, out count) && count < 0)
+                    count = -1;
             }
 
-            Remind remind = Remind.FromDate(current_id, message, next, interval, stop);
+
+            Remind remind = Remind.FromDate(current_id, message, next, interval, stop, count);
 
             if (remind.next <= DateTimeOffset.Now)
             {

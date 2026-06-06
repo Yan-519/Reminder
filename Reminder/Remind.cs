@@ -1,15 +1,23 @@
 ﻿using Plugin.LocalNotification.Core.Models;
+using System.Text;
 
 namespace Reminder
 {
     public class Remind : IComparable<Remind>, IEquatable<Remind>
     {
+        [Flags]
         public enum Remind_type
         {
-            Once,
-            Repeat_without_stop,
-            Repeat_with_stop,
+            Once = 0,
+            Repeat_without_stop = 1 << 0,
+            Repeat_with_stop_date = 1 << 1,
+            Repeat_with_stop_count = 1 << 2
         }
+
+        public static readonly Remind_type WithInterval =
+            Remind_type.Repeat_without_stop |
+            Remind_type.Repeat_with_stop_date |
+            Remind_type.Repeat_with_stop_count;
 
         public static readonly Remind Now = new(-1, string.Empty, DateTimeOffset.Now);
 
@@ -22,6 +30,8 @@ namespace Reminder
         public DateTimeOffset next { private set; get; }
         public TimeSpan interval { private set; get; } = TimeSpan.Zero;
         public DateTimeOffset stop { private set; get; } = DateTimeOffset.Now;
+
+        public int StopAfter { private set; get; } = 0;
 
         public string view_date => message + " \n" + (next.Second != 0 ? next.ToString("dd/MM/yyyy-HH:mm:ss") : next.ToString("dd/MM/yyyy-HH:mm"));
 
@@ -52,7 +62,7 @@ namespace Reminder
 
         public Remind(int id, string message, DateTimeOffset next, TimeSpan interval, DateTimeOffset stop)
         {
-            type = Remind_type.Repeat_with_stop;
+            type = Remind_type.Repeat_with_stop_date;
 
             this.id = id;
             this.message = message;
@@ -63,12 +73,30 @@ namespace Reminder
             Update_next();
         }
 
+        public Remind(int id, string message, DateTimeOffset next, TimeSpan interval, int count)
+        {
+            type = Remind_type.Repeat_with_stop_count;
+
+            this.id = id;
+            this.message = message;
+            this.next = next;
+            this.interval = interval;
+            StopAfter = count;
+
+            Update_next();
+        }
+
+
         private void Update_next()
         {
             if (type == Remind_type.Once)
                 return;
 
-            while (next < DateTimeOffset.Now)
+            else if (type == Remind_type.Repeat_with_stop_count)
+                for (int i = 0; next < DateTimeOffset.Now && i < StopAfter; i++)
+                    next = next.Add(interval);
+
+            else while (next < DateTimeOffset.Now)
                 next = next.Add(interval);
         }
 
@@ -100,11 +128,13 @@ namespace Reminder
 
         public static bool TryParse(NotificationRequest notification, out Remind remind)
         {
-            int id = notification.NotificationId;
-            string message = notification.Description;
+            int Id = notification.NotificationId;
+            string Message = notification.Description;
             DateTimeOffset? next = notification.Schedule.NotifyTime;
             TimeSpan? interval = notification.Schedule.NotifyRepeatInterval;
             DateTimeOffset? stop_date = notification.Schedule.NotifyAutoCancelTime;
+
+            string Subtitle = notification.Subtitle;
 
             if (next is null)
             {
@@ -113,11 +143,20 @@ namespace Reminder
             }
 
             else if (stop_date is not null)
-                remind = new Remind(id, message, next.Value, interval!.Value, stop_date.Value);
+                remind = new Remind(Id, Message, next.Value, interval!.Value, stop_date.Value);
+            else if (!string.IsNullOrEmpty(Subtitle))
+            {
+                StringBuilder builder = new();
+                foreach (char ch in Subtitle)
+                    if (char.IsDigit(ch))
+                        builder.Append(ch);
+
+                remind = new Remind(Id, Message, next.Value, interval!.Value, int.Parse(builder.ToString()));
+            }
             else if (interval is not null)
-                remind = new Remind(id, message, next.Value, interval.Value);
+                remind = new Remind(Id, Message, next.Value, interval.Value);
             else
-                remind = new Remind(id, message, next.Value);
+                remind = new Remind(Id, Message, next.Value);
 
             return true;
         }
@@ -126,41 +165,44 @@ namespace Reminder
         {
             NotificationRequestSchedule schedule = new()
             {
-                NotifyTime = this.next,
+                NotifyTime = next,
                 Android =
                 {
                     ScheduleMode = Plugin.LocalNotification.Core.Models.AndroidOption.AndroidScheduleMode.ExactAllowWhileIdle
                 }
             };
 
-            if (this.type == Remind_type.Repeat_without_stop || this.type == Remind_type.Repeat_with_stop)
+            if ((type & WithInterval) != 0)
             {
                 schedule.RepeatType = NotificationRepeat.TimeInterval;
-                schedule.NotifyRepeatInterval = this.interval;
+                schedule.NotifyRepeatInterval = interval;
 
-                if (this.type == Remind_type.Repeat_with_stop)
-                    schedule.NotifyAutoCancelTime = this.stop;
+                if (type == Remind_type.Repeat_with_stop_date)
+                    schedule.NotifyAutoCancelTime = stop;
             }
 
             NotificationRequest request = new()
             {
-                NotificationId = this.id,
+                NotificationId = id,
                 Title = AppInfo.Name,
-                Description = this.message,
+                Description = message,
+                Subtitle = StopAfter == 0 ? string.Empty : $"Stops after {StopAfter} times",
                 Schedule = schedule
             };
             return request;
         }
 
-        public static Remind FromDate(int Id, string Message, DateTimeOffset next, TimeSpan interval, DateTimeOffset stop)
+        public static Remind FromDate(int Id, string Message, DateTimeOffset next, TimeSpan interval, DateTimeOffset stop, int Count)
         {
             Remind remind;
-            if (interval == default)
-                remind = new Remind(Id, Message, next);
-            else if (stop == default)
+            if (stop != default)
+                remind = new Remind(Id, Message, next, interval, stop);
+            else if(Count != -1)
+                remind = new Remind(Id, Message, next, interval, Count);
+            else if(interval != default)
                 remind = new Remind(Id, Message, next, interval);
             else
-                remind = new Remind(Id, Message, next, interval, stop);
+                remind = new Remind(Id, Message, next);
 
             return remind;
         }

@@ -36,7 +36,7 @@ namespace Reminder
                 if (Remind.TryParse(notification, out Remind remind))
                 {
                     if (remind.type == Remind_type.Once && remind.next < DateTimeOffset.Now ||
-                        remind.type == Remind_type.Repeat_with_stop && remind.stop < DateTimeOffset.Now)
+                        remind.type == Remind_type.Repeat_with_stop_date && remind.stop < DateTimeOffset.Now)
                     {
                         LocalNotificationCenter.Current.Cancel(notification.NotificationId);
                     }
