@@ -33,21 +33,21 @@
 
             <VerticalStackLayout IsEnabled="{Binding Source={x:Reference IntervalCheck}, Path=IsChecked}">
 
-                <Label Text="Interval Duration Days-Years\HH:MM-SS" TextColor="Black" />
-                <Grid ColumnDefinitions="*, *, auto, auto" RowDefinitions="Auto" ColumnSpacing="8">
-
-                    <VerticalStackLayout Grid.Column="0" Spacing="4">
-                        <Label Text="Days" FontSize="Micro" TextColor="Black" />
-                        <Entry x:Name="IntervalDaysEntry" Keyboard="Numeric" Placeholder="0" TextColor="Black" PlaceholderColor="Black"/>
-                    </VerticalStackLayout>
+                <Label Text="Interval Duration: Days-Months-Years\HH:MM-SS" TextColor="Black" />
+                <Grid ColumnDefinitions="*, *, *, auto, auto" RowDefinitions="Auto" ColumnSpacing="8">
                     
-                    <VerticalStackLayout Grid.Column="1" Spacing="4">
-                        <Label Text="Years" FontSize="Micro"  TextColor="Black"/>
-                        <Entry x:Name="IntervalYearsEntry" Keyboard="Numeric" Placeholder="0" TextColor="Black" PlaceholderColor="Black"/>
-                    </VerticalStackLayout>
+                    <Entry x:Name="IntervalDaysEntry" Keyboard="Numeric" Placeholder="0" 
+                           TextColor="Black" PlaceholderColor="Black"
+                           Grid.Column="0"/>
+                    <Entry x:Name="IntervalMonthsEntry" Keyboard="Numeric" Placeholder="0" 
+                           TextColor="Black" PlaceholderColor="Black"
+                           Grid.Column="1"/>
+                    <Entry x:Name="IntervalYearsEntry" Keyboard="Numeric" Placeholder="0" 
+                           TextColor="Black" PlaceholderColor="Black"
+                           Grid.Column="2"/>
 
-                    <TimePicker x:Name="IntervalTimePicker" Grid.Column="2" TextColor="Black" />
-                    <Picker x:Name="IntervalTimeSecondPicker" WidthRequest="80" Grid.Column="3" TextColor="Black" TitleColor="Black"/>
+                    <TimePicker x:Name="IntervalTimePicker" Grid.Column="3" TextColor="Black" />
+                    <Picker x:Name="IntervalTimeSecondPicker" WidthRequest="80" Grid.Column="4" TextColor="Black" TitleColor="Black"/>
                 </Grid>
 
                 <HorizontalStackLayout VerticalOptions="Center" Spacing="8">

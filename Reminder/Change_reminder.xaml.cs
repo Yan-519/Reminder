@@ -96,9 +96,13 @@ public partial class Change_reminder : ContentPage
         if ((current.type & Remind.WithInterval) != 0)
         {
             IntervalCheck.IsChecked = true;
-            int totDays = (int)current.interval.TotalDays;
-            IntervalYearsEntry.Text = (totDays / 365).ToString();
-            IntervalDaysEntry.Text = (totDays % 365).ToString();
+            DateTime now = DateTime.Now;
+            DateTime date = now.Add(current.interval);
+
+            IntervalYearsEntry.Text = (date.Year - now.Year).ToString();
+            IntervalMonthsEntry.Text = (date.Month - now.Month).ToString();
+            IntervalDaysEntry.Text = (date.Day - now.Day).ToString();
+
             SetTimePickers(IntervalTimePicker, IntervalTimeSecondPicker, current.interval);
 
             if (current.type == Remind_type.Repeat_with_stop_date)
@@ -151,13 +155,18 @@ public partial class Change_reminder : ContentPage
                     Message_box.Show("Days in interval must be positive");
                     return;
                 }
+                if (int.TryParse(IntervalMonthsEntry?.Text, out int months) && days < 0)
+                {
+                    Message_box.Show("Days in interval must be positive");
+                    return;
+                }
                 if (int.TryParse(IntervalYearsEntry?.Text, out int years) && years < 0)
                 {
                     Message_box.Show("Years in interval must be positive");
                     return;
                 }
 
-                interval = TimeSpan.FromDays(days + years * 365L) +
+                interval = DateTime.Now.AddYears(years).AddMonths(months).AddDays(days) - DateTime.Now +
                     GetTimeFromPickers(IntervalTimePicker, IntervalTimeSecondPicker)!.Value;
 
                 if (interval <= TimeSpan.Zero)
